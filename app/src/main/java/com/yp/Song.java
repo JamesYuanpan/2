@@ -7,15 +7,6 @@ public class Song implements Serializable {
     private String imageUrl;
     private String preview_url;
     private String songerName;
-    private int duration_ms;
-
-    public int getDuration_ms() {
-        return duration_ms;
-    }
-
-    public void setDuration_ms(int duration_ms) {
-        this.duration_ms = duration_ms;
-    }
 
     public String getSongName() {
         return songName;

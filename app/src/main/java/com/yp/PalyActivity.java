@@ -31,6 +31,15 @@ public class PalyActivity extends AppCompatActivity implements View.OnClickListe
     private int position;
     private MediaPlayer mediaPlayer;
 
+    ////////////////////////////////////////////////////////////////
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            seekBar.setProgress(msg.arg1);
+            startTime.setText(msg.arg1/1000/60+":"+msg.arg1/1000%60);
+        }
+    };
+    ///////////////////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,11 +56,11 @@ public class PalyActivity extends AppCompatActivity implements View.OnClickListe
         position = i.getIntExtra("position",0);
         songList = (List<Song>) i.getSerializableExtra("songList");
 
-        setValueToView(position);
+
 
 //        Log.d("PalyActivity",songList.get(position).getPreview_url());
         initMediaPlayer(position);
-
+        setValueToView(position);
         btnPlay.setOnClickListener(this);
         btnPre.setOnClickListener(this);
         btnNext.setOnClickListener(this);
@@ -117,9 +126,14 @@ public class PalyActivity extends AppCompatActivity implements View.OnClickListe
         trackNameText.setText(songList.get(position).getSongName());
         Picasso.with(this).load(songList.get(position).getImageUrl()).resize(760,0).into(imageView);
 
-        seekBar.setMax(songList.get(position).getDuration_ms());
+//        seekBar.setMax(songList.get(position).getDuration_ms());
+        if(mediaPlayer != null){
+            seekBar.setMax(mediaPlayer.getDuration());
+            endTime.setText(mediaPlayer.getDuration()/1000/60 + ":" +mediaPlayer.getDuration()/1000%60);
+        }
 
-        endTime.setText(songList.get(position).getDuration_ms()/1000/60 + ":" + songList.get(position).getDuration_ms()/1000%60);
+
+//        endTime.setText(songList.get(position).getDuration_ms()/1000/60 + ":" + songList.get(position).getDuration_ms()/1000%60);
 
     }
 
@@ -139,14 +153,34 @@ public class PalyActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_pre:
                 if(position > 0){
                     position--;
-                    setValueToView(position);
                     initMediaPlayer(position);
+                    setValueToView(position);
+                    btnPlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
                 }
                 break;
             case R.id.btn_play:
                 if(mediaPlayer != null){
                     if(!mediaPlayer.isPlaying()){
                         mediaPlayer.start();
+                        ////////////////////////////////////////////////////////////////////////
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                while (true){
+                                    try {
+                                        Thread.sleep(1000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    int currentPosition = mediaPlayer.getCurrentPosition();
+                                    Log.d("PalyActivity","当前进度为!!!!!!!!"+currentPosition+"");
+                                    Message message = new Message();
+                                    message.arg1 = currentPosition;
+                                    handler.sendMessage(message);
+                                }
+                            }
+                        }).start();
+                        ////////////////////////////////////////////////////////////////////////
                         btnPlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
                     }else if(mediaPlayer.isPlaying()){
                         mediaPlayer.pause();
@@ -157,8 +191,9 @@ public class PalyActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_next:
                 if(position < songList.size()){
                     position++;
-                    setValueToView(position);
                     initMediaPlayer(position);
+                    setValueToView(position);
+                    btnPlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
                 }
                 break;
                 default:

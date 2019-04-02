@@ -22,7 +22,7 @@ import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.Tracks;
 
 public class SongListActivity extends AppCompatActivity {
-    private static final String TOKEN = "BQBxXhtgHKcKvG-9S0FCScBicuP3fFogjAgHPImZxL1vwcCn3DbB6QuOHiwDSlKYUkTm5scdSVXE7sh3L12dE1hFlFSo5Lku-5ueFedvhO-hkeRwviOFAwGzA8ugrNPbD-d-u1tZ8pxteKYUc_LTNyelq9272YVIQcl1j1hdYw";
+    private static final String TOKEN = "BQCYfC2DKYbSMkYmhQSX-PD6oy5zQgstcwh_mzqGrDr04tsL0DlG8bhboP_X5VsMjNBeiBF8F1s9a7Ge-fTjZ0m2TaiwkS3tPxDvU0nwMv--q_BRUgNrV5u-Y1EnpZOKgUEOwpl6YYdRl8kpihNIQdyxlBEuWeGIr1FLqrnWnQ";
 
     private List<Song> songList = new ArrayList<>();
     private ListView listView;
@@ -90,8 +90,7 @@ public class SongListActivity extends AppCompatActivity {
                     String songerName = trackList.get(i).artists.get(0).name;
                     String imageUrl = trackList.get(i).album.images.get(0).url;
                     String preview_url = trackList.get(i).preview_url;
-                    int duration_ms = (int) trackList.get(i).duration_ms;
-                    songList.add(createSong(songName,songerName,imageUrl,preview_url,duration_ms));
+                    songList.add(createSong(songName,songerName,imageUrl,preview_url));
                 }
             }else {
                 for (int i=0;i<trackList.size();i++){
@@ -99,8 +98,7 @@ public class SongListActivity extends AppCompatActivity {
                     String songerName = trackList.get(i).artists.get(0).name;
                     String imageUrl = trackList.get(i).album.images.get(0).url;
                     String preview_url = trackList.get(i).preview_url;
-                    int duration_ms = (int) trackList.get(i).duration_ms;
-                    songList.add(createSong(songName,songerName,imageUrl,preview_url,duration_ms));
+                    songList.add(createSong(songName,songerName,imageUrl,preview_url));
                 }
             }
 
@@ -114,24 +112,23 @@ public class SongListActivity extends AppCompatActivity {
         }
     }
 
-    private Song createSong(String songName,String songerName,String imageUrl,String preview_url,int duration_ms){
+    private Song createSong(String songName,String songerName,String imageUrl,String preview_url){
 
         Song song = new Song();
         song.setSongName(songName);
         song.setSongerName(songerName);
         song.setImageUrl(imageUrl);
         song.setPreview_url(preview_url);
-        song.setDuration_ms(duration_ms);
 
         return song;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.song_refresh,menu);
-
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.song_refresh,menu);
+//
+//        return true;
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -139,9 +136,7 @@ public class SongListActivity extends AppCompatActivity {
         int id = item.getItemId();
         if(id == android.R.id.home){
             onBackPressed();
-        }else if(id == R.id.refresh_menu){
-            songList.clear();
-            new SongTask().execute();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
