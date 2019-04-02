@@ -26,7 +26,7 @@ import kaaes.spotify.webapi.android.models.ArtistsPager;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String TOKEN = "BQBxXhtgHKcKvG-9S0FCScBicuP3fFogjAgHPImZxL1vwcCn3DbB6QuOHiwDSlKYUkTm5scdSVXE7sh3L12dE1hFlFSo5Lku-5ueFedvhO-hkeRwviOFAwGzA8ugrNPbD-d-u1tZ8pxteKYUc_LTNyelq9272YVIQcl1j1hdYw";
+    private static final String TOKEN = "BQAMEytKG6myjoCsZgcuIfxFo7Hr9_sIw6rOUj4N0C-ER-v2J8e871RJ83skurP7KbH5xb8EOTiJ5ivnPsdu6nCq2jt_S_-1I28Smu2KZ-oGyhWbfxMzMTEG5Ykv8oybBGNUx-l08ilCE94dag66xS3U4Cq2hjS5WILj6IADfQ";
     private ListView listView;
     private EditText editText;
     private Button btnSearch;
@@ -154,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(id == R.id.refresh_menu){
             songerList.clear();
             new SongerTask().execute(songerNames);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);

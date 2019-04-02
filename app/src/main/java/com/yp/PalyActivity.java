@@ -2,6 +2,9 @@ package com.yp;
 
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,16 +32,16 @@ public class PalyActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton btnPre,btnPlay,btnNext;
     private List<Song> songList;
     private int position;
-    private MediaPlayer mediaPlayer;
+    private MediaPlayer mediaPlayer = new MediaPlayer();
 
     ////////////////////////////////////////////////////////////////
-    private Handler handler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            seekBar.setProgress(msg.arg1);
-            startTime.setText(msg.arg1/1000/60+":"+msg.arg1/1000%60);
-        }
-    };
+//    private Handler handler = new Handler(){
+//        @Override
+//        public void handleMessage(Message msg) {
+//            seekBar.setProgress(msg.arg1);
+////            startTime.setText(msg.arg1/1000/60+":"+msg.arg1/1000%60);
+//        }
+//    };
     ///////////////////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,11 +72,11 @@ public class PalyActivity extends AppCompatActivity implements View.OnClickListe
     private void initMediaPlayer(int position){
         try{
             String path = songList.get(position).getPreview_url();
-            if(mediaPlayer != null){
-                mediaPlayer.stop();
-                mediaPlayer.release();
-            }
-            mediaPlayer = new MediaPlayer();
+//            if(mediaPlayer != null){
+//                mediaPlayer.stop();
+//                mediaPlayer.release();
+//            }
+//            mediaPlayer = new MediaPlayer();
 
             mediaPlayer.setDataSource(path);
             mediaPlayer.prepare();
@@ -94,6 +97,15 @@ public class PalyActivity extends AppCompatActivity implements View.OnClickListe
         btnNext = (ImageButton) findViewById(R.id.btn_next);
         btnPlay = (ImageButton) findViewById(R.id.btn_play);
 
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mp.seekTo(0);
+                startTime.setText("0:00");
+                seekBar.setProgress(0);
+                btnPlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
+            }
+        });
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -110,8 +122,15 @@ public class PalyActivity extends AppCompatActivity implements View.OnClickListe
             public void onStopTrackingTouch(SeekBar sb) {
                 if(mediaPlayer != null){
                     int progress = sb.getProgress();
-                    startTime.setText(progress/1000/60 + ":" + progress/1000%60);
-                    mediaPlayer.seekTo(progress);
+                    if(progress == sb.getMax()){
+                        startTime.setText("0:00");
+                        mediaPlayer.seekTo(0);
+                        btnPlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
+                    }else {
+                        startTime.setText(progress/1000/60 + ":" + progress/1000%60);
+                        mediaPlayer.seekTo(progress);
+                    }
+
 //                    mediaPlayer.start();
 //                    btnPlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
                 }
@@ -142,6 +161,7 @@ public class PalyActivity extends AppCompatActivity implements View.OnClickListe
         int id = item.getItemId();
         if(id == android.R.id.home){
             onBackPressed();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -153,6 +173,7 @@ public class PalyActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_pre:
                 if(position > 0){
                     position--;
+                    mediaPlayer.reset();
                     initMediaPlayer(position);
                     setValueToView(position);
                     btnPlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
@@ -163,24 +184,32 @@ public class PalyActivity extends AppCompatActivity implements View.OnClickListe
                     if(!mediaPlayer.isPlaying()){
                         mediaPlayer.start();
                         ////////////////////////////////////////////////////////////////////////
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                while (true){
-                                    try {
-                                        Thread.sleep(1000);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                    int currentPosition = mediaPlayer.getCurrentPosition();
-                                    Log.d("PalyActivity","当前进度为!!!!!!!!"+currentPosition+"");
-                                    Message message = new Message();
-                                    message.arg1 = currentPosition;
-                                    handler.sendMessage(message);
-                                }
-                            }
-                        }).start();
+//                        new Thread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                while (true){
+//                                    try {
+//                                        Thread.sleep(1000);
+//                                    } catch (InterruptedException e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                    int currentPosition;
+//                                    Message message = new Message();
+//                                    if(mediaPlayer != null){
+//                                        currentPosition = mediaPlayer.getCurrentPosition();
+//                                        message.arg1 = currentPosition;
+//                                        Log.d("PalyActivity","当前进度为!!!!!!!!"+currentPosition+"");
+//                                        handler.sendMessage(message);
+//                                    }else {
+//                                        break;
+//                                    }
+//
+//
+//                                }
+//                            }
+//                        }).start();
                         ////////////////////////////////////////////////////////////////////////
+                        new UpdateProgressTask().execute();
                         btnPlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
                     }else if(mediaPlayer.isPlaying()){
                         mediaPlayer.pause();
@@ -191,6 +220,7 @@ public class PalyActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_next:
                 if(position < songList.size()){
                     position++;
+                    mediaPlayer.reset();
                     initMediaPlayer(position);
                     setValueToView(position);
                     btnPlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
@@ -200,12 +230,46 @@ public class PalyActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    class UpdateProgressTask extends AsyncTask<Void,Integer,Void>{
+
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            while (true){
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if(mediaPlayer == null){
+                    break;
+                }
+
+                int progressPosition = mediaPlayer.getCurrentPosition();
+
+                publishProgress(progressPosition);
+                if(progressPosition == mediaPlayer.getDuration()){
+                    break;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            seekBar.setProgress(values[0]);
+            startTime.setText(values[0]/1000/60+":"+values[0]/1000%60);
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.i("PalyActivity","!!!!!!!!!!!!该活动被销毁!!!!!!!!!!!!");
         if(mediaPlayer != null){
             mediaPlayer.stop();
             mediaPlayer.release();
+            mediaPlayer = null;
         }
     }
 }

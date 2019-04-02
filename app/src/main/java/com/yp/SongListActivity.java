@@ -22,7 +22,7 @@ import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.Tracks;
 
 public class SongListActivity extends AppCompatActivity {
-    private static final String TOKEN = "BQCYfC2DKYbSMkYmhQSX-PD6oy5zQgstcwh_mzqGrDr04tsL0DlG8bhboP_X5VsMjNBeiBF8F1s9a7Ge-fTjZ0m2TaiwkS3tPxDvU0nwMv--q_BRUgNrV5u-Y1EnpZOKgUEOwpl6YYdRl8kpihNIQdyxlBEuWeGIr1FLqrnWnQ";
+    private static final String TOKEN = "BQAMEytKG6myjoCsZgcuIfxFo7Hr9_sIw6rOUj4N0C-ER-v2J8e871RJ83skurP7KbH5xb8EOTiJ5ivnPsdu6nCq2jt_S_-1I28Smu2KZ-oGyhWbfxMzMTEG5Ykv8oybBGNUx-l08ilCE94dag66xS3U4Cq2hjS5WILj6IADfQ";
 
     private List<Song> songList = new ArrayList<>();
     private ListView listView;
