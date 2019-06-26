@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView error;
 
     private List<Songer> songerList = new ArrayList<>();
-    private String[] songerNames = {"邓紫棋","薛之谦","张杰","林俊杰","许嵩","陈奕迅","谢霆锋","周杰伦","蔡依林","华晨宇"};
+    private String[] songerNames = {"邓紫棋","薛之谦","张杰","林俊杰","许嵩","陈奕迅","谢霆锋","周杰伦","蔡依林","华晨宇","胡歌"};
 //    private String[] songerNames = {"刘德华"};
     private SongerAdapter adapter;
 
