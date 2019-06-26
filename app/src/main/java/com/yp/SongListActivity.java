@@ -29,8 +29,6 @@ public class SongListActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private static String artistId;
 
-    //测试revert功能33333333333
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
