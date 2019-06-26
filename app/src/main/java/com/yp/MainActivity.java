@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+//哈哈，我测试一下啦
         listView = (ListView) findViewById(R.id.list_view);
         editText = (EditText) findViewById(R.id.edit_query);
         btnSearch = (Button) findViewById(R.id.btn_search);
